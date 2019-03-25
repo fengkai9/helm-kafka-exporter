@@ -1,0 +1,57 @@
+## number of exporter instances
+##
+replicaCount: 1
+
+## restart policy for all containers
+##
+restartPolicy: Always
+
+image:
+  repository: danielqsj/kafka-exporter
+  tag: v1.2.0
+  pullPolicy: IfNotPresent
+
+resources: {}
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  httpPort: 9308
+  annotations: {}
+
+hostAliases:
+  - name: localhost
+    ip: 127.0.0.1
+
+kafka:
+  brokers:
+  - uri: localhost:9092
+
+  ## Address (host and port) of the Kafka broker we should connect to.
+  ## This could be a local node (localhost:9092, for instance), or the address
+  ## of a remote Broker server. 
+
+  version: 1.0.0
+  ## Kafka Broker server version. 
+web:
+  ## Path under which to expose metrics.
+  ##
+  path: /metrics
+
+serviceMonitor:
+  ## If true, a ServiceMonitor CRD is created for a prometheus operator
+  ## https://github.com/coreos/prometheus-operator
+  ##
+  enabled: false
+  interval: 30s
+  namespace: 
+  labels: {}

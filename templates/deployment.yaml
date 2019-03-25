@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "kafka-exporter.fullname" . }}
+  labels:
+    chart: {{ template "kafka-exporter.chart" . }}
+    app: {{ template "kafka-exporter.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "kafka-exporter.name" . }}
+      release: "{{ .Release.Name }}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ template "kafka-exporter.name" . }}
+        release: "{{ .Release.Name }}"
+      {{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: {{ .Values.restartPolicy }}
+      {{- if .Values.hostAliases }}
+      hostAliases:
+      {{- range .Values.hostAliases }}
+      - ip: "{{ .ip}}"
+        hostnames:
+        - "{{ .name }}"
+      {{- end }}
+      {{- end }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: 
+          {{- range .Values.kafka.brokers}}
+          - "--kafka.server={{ .uri}}"
+          {{- end }}
+          - "--kafka.version={{ .Values.kafka.version }}"
+          - "--web.listen-address=:{{ .Values.service.httpPort }}"
+          - "--web.telemetry-path={{ .Values.web.path }}"
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          ports:
+            - containerPort: {{ .Values.service.httpPort }}
+              name: http
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

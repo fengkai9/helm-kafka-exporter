@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "kafka-exporter.fullname" . }}
+  labels:
+    chart: {{ template "kafka-exporter.chart" . }}
+    app: {{ template "kafka-exporter.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+{{- if .Values.service.annotations }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.httpPort }}
+      protocol: TCP
+  selector:
+    app: {{ template "kafka-exporter.name" . }}
+    release: "{{ .Release.Name }}"

@@ -1,0 +1,15 @@
+apiVersion: v1
+appVersion: 1.2.0
+description: Kafka stats exporter for Prometheus
+home: https://github.com/danielqsj/kafka_exporter
+keywords:
+- metrics
+- kafka
+- monitoring
+maintainers:
+- email: fengkai9@gmail.com
+  name: fengkai
+name: kafka-exporter
+sources:
+- https://github.com/fengkai9/kafka-exporter
+version: 1.0.0
